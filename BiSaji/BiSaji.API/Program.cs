@@ -1,4 +1,15 @@
 
+using BiSaji.API.Data;
+using BiSaji.API.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using Serilog;
+using Serilog.Events;
+using System.Text;
+
 namespace BiSaji.API
 {
     public class Program
@@ -8,12 +19,119 @@ namespace BiSaji.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            var logger = new LoggerConfiguration()
+            .WriteTo.Console()
+            .WriteTo.File(
+                path: "Logs/InfoLogs/NzWalks_Info_log_.txt",
+                rollingInterval: RollingInterval.Hour,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                retainedFileCountLimit: 365 / 2 // keep logs for 6 months
+                )
+            .MinimumLevel.Information()
+            .WriteTo.File(
+                path: "Logs/Errorlogs/NzWalks_Error_log_.txt",
+                rollingInterval: RollingInterval.Hour,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                retainedFileCountLimit: 365, // keep logs for 12 months
+                restrictedToMinimumLevel: LogEventLevel.Error // only log error and above (critical)
+            )
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .CreateLogger();
+            //.CreateBootstrapLogger();
+
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog(logger);
+
 
             builder.Services.AddControllers();
+            builder.Services.AddHttpContextAccessor();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Bi Saji API",
+                    Version = "v1",
+                    Description = "This API is for managing Bi Saji.",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Mario Medhat",
+                        Email = "mario.medhat.mansour@gmail.com",
+                        Url = new Uri("https://www.linkedin.com/in/mario-medhat-9241b1216/"),
+                    }
+                });
+
+                options.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                });
+
+                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference(
+                        JwtBearerDefaults.AuthenticationScheme,
+                        document
+                        )] = new List<string>()
+                });
+
+            });
+
+
+            // Add DbContext for the main database connection
+            builder.Services.AddDbContext<BiSajiDbContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("BiSajiConnectionString"));
+            });
+
+            builder.Services.AddDbContext<BiSajiDbAuthContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("BiSajiAuthConnectionString"));
+            });
+
+            // For in-memory repository (Development purposes)
+            //builder.Services.AddScoped<IRegionRepository, InMemoryRegionRepository>();
+
+            // For SQL repository (Production purposes)
+            builder.Services.AddScoped<ITokenRepository, SQLTokenRepository>();
+
+            // TODO: Add AutoMapper
+            //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
+
+            builder.Services.AddIdentityCore<IdentityUser>()
+                .AddRoles<IdentityRole>()
+                .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("BiSajiDb")
+                .AddEntityFrameworkStores<BiSajiDbAuthContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 1;
+            });
+
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                });
 
             var app = builder.Build();
 
@@ -31,6 +149,7 @@ namespace BiSaji.API
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
