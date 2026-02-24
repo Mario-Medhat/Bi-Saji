@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace BiSaji.API.Repositories
+namespace BiSaji.API.Interfaces.RepositoryInterfaces
 {
     public interface ITokenRepository
     {

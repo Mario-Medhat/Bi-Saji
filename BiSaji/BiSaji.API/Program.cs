@@ -1,6 +1,9 @@
 
 using BiSaji.API.Data;
+using BiSaji.API.Interfaces.RepositoryInterfaces;
+using BiSaji.API.Interfaces.ServicesInterfaces;
 using BiSaji.API.Repositories;
+using BiSaji.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -52,9 +55,9 @@ namespace BiSaji.API
             {
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "Bi Saji API",
+                    Title = "Bi Saji API App",
                     Version = "v1",
-                    Description = "This API is for managing Bi Saji.",
+                    Description = "This API is for managing Bi Saji App.",
                     Contact = new OpenApiContact
                     {
                         Name = "Mario Medhat",
@@ -98,6 +101,8 @@ namespace BiSaji.API
 
             // For SQL repository (Production purposes)
             builder.Services.AddScoped<ITokenRepository, SQLTokenRepository>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
+            builder.Services.AddScoped<IUserRepository, SQLUsersRepository>();
 
             // TODO: Add AutoMapper
             //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));

@@ -6,7 +6,10 @@ namespace BiSaji.API.Models.Dto
     {
         [Required]
         [DataType(DataType.PhoneNumber)]
-        public string Username { get; set; }
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        public string FullName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
