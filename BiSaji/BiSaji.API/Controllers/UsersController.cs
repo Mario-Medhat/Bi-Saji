@@ -1,5 +1,6 @@
 ﻿using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
+using BiSaji.API.Models.Domain;
 using BiSaji.API.Models.Dto;
 using BiSaji.API.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -15,11 +16,11 @@ namespace BiSaji.API.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<Servant> userManager;
         private readonly IUserRepository userRepository;
         private readonly ILogger<AuthController> logger;
 
-        public UsersController(UserManager<IdentityUser> userManager, IUserRepository userRepository, ILogger<AuthController> logger)
+        public UsersController(UserManager<Servant> userManager, IUserRepository userRepository, ILogger<AuthController> logger)
         {
             this.userManager = userManager;
             this.userRepository = userRepository;
@@ -113,7 +114,7 @@ namespace BiSaji.API.Controllers
             try
             {
                 // create user with user repository and return the result
-                (var identityResult, var identityUser) = await userRepository.CreateAsync(regiesterRequestDto);
+                (var identityResult, var servant) = await userRepository.CreateAsync(regiesterRequestDto);
 
                 if (!identityResult.Succeeded)
                 {
@@ -141,7 +142,7 @@ namespace BiSaji.API.Controllers
             try
             {
                 // create user with user repository and return the result
-                (var identityResult, var identityUser) = await userRepository.UpdateAsync(id, updateRequestDto);
+                (var identityResult, var servant) = await userRepository.UpdateAsync(id, updateRequestDto);
 
                 if (!identityResult.Succeeded)
                 {
@@ -153,8 +154,8 @@ namespace BiSaji.API.Controllers
                 var userDto = new UserDto
                 {
                     Id = id,
-                    FullName = identityUser.UserName,
-                    PhoneNumber = identityUser.PhoneNumber
+                    FullName = servant.UserName,
+                    PhoneNumber = servant.PhoneNumber
                 };
 
                 logger.LogInformation($"User {updateRequestDto.FullName} updated successfully");

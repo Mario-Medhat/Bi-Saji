@@ -1,6 +1,7 @@
 ﻿using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
+using BiSaji.API.Models.Domain;
 using BiSaji.API.Models.Dto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,18 +10,18 @@ namespace BiSaji.API.Repositories
 {
     public class SQLUsersRepository : IUserRepository
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<Servant> userManager;
 
-        public SQLUsersRepository(UserManager<IdentityUser> userManager)
+        public SQLUsersRepository(UserManager<Servant> userManager)
         {
             this.userManager = userManager;
         }
 
-        public Task<IdentityResult> AddRolesToUserAsync(IdentityUser identityUser, params string[] roles)
+        public Task<IdentityResult> AddRolesToUserAsync(Servant servant, params string[] roles)
         {
             try
             {
-                return userManager.AddToRolesAsync(identityUser, roles);
+                return userManager.AddToRolesAsync(servant, roles);
             }
             catch (Exception ex)
             {
@@ -29,7 +30,7 @@ namespace BiSaji.API.Repositories
 
         }
 
-        public async Task<(IdentityResult, IdentityUser)> CreateAsync(RegiesterRequestDto regiesterRequestDto)
+        public async Task<(IdentityResult, Servant)> CreateAsync(RegiesterRequestDto regiesterRequestDto)
         {
             if (regiesterRequestDto == null)
                 throw new ArgumentNullException(nameof(regiesterRequestDto));
@@ -41,19 +42,19 @@ namespace BiSaji.API.Repositories
             if (isUserAlreadyExists)
                 throw new UserAlreadyExistsException(regiesterRequestDto.PhoneNumber);
 
-            // Create a new IdentityUser based on the registration details
-            var identityUser = new IdentityUser
+            // Create a new Servant based on the registration details
+            var servant = new Servant
             {
                 UserName = regiesterRequestDto.FullName,
                 PhoneNumber = regiesterRequestDto.PhoneNumber
             };
 
-            var identityResult = await userManager.CreateAsync(identityUser, regiesterRequestDto.Password);
+            var identityResult = await userManager.CreateAsync(servant, regiesterRequestDto.Password);
 
-            return (identityResult, identityUser);
+            return (identityResult, servant);
         }
 
-        public async Task<IEnumerable<IdentityUser>> GetAllAsync(string? filterOn, string? filterQuery)
+        public async Task<IEnumerable<Servant>> GetAllAsync(string? filterOn, string? filterQuery)
         {
             var users = userManager.Users.AsQueryable();
 
@@ -73,12 +74,12 @@ namespace BiSaji.API.Repositories
             return await users.ToListAsync();
         }
 
-        public async Task<IdentityUser?> GetByIdAsync(Guid id)
+        public async Task<Servant?> GetByIdAsync(Guid id)
         {
             return await userManager.Users.FirstOrDefaultAsync(user => user.Id == id.ToString());
         }
 
-        public async Task<(IdentityResult, IdentityUser)> UpdateAsync(Guid id, UpdateRequestDto updateRequestDto)
+        public async Task<(IdentityResult, Servant)> UpdateAsync(Guid id, UpdateRequestDto updateRequestDto)
         {
 
             try
@@ -123,8 +124,9 @@ namespace BiSaji.API.Repositories
             }
         }
 
-        public Task<IdentityUser?> DeleteAsync(Guid id)
+        public Task<Servant?> DeleteAsync(Guid id)
         {
+            // TODO: Implement the logic to delete a user by their ID
             throw new NotImplementedException();
         }
     }

@@ -1,6 +1,7 @@
 ﻿using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Interfaces.ServicesInterfaces;
+using BiSaji.API.Models.Domain;
 using BiSaji.API.Models.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,14 +15,14 @@ namespace BiSaji.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<Servant> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ITokenRepository tokenRepository;
         private readonly IUserRepository userRepository;
         private readonly IRoleService roleService;
         private readonly ILogger<AuthController> logger;
 
-        public AuthController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
+        public AuthController(UserManager<Servant> userManager, RoleManager<IdentityRole> roleManager,
             ITokenRepository tokenRepository, IUserRepository userRepository, IRoleService roleService, ILogger<AuthController> logger)
         {
             this.userManager = userManager;
@@ -41,7 +42,7 @@ namespace BiSaji.API.Controllers
             try
             {
                 // create user and get the result
-                (var identityResult, var identityUser) = await userRepository.CreateAsync(regiesterRequestDto);
+                (var identityResult, var servant) = await userRepository.CreateAsync(regiesterRequestDto);
 
                 // If the user creation failed, log the error and return a bad request response
                 if (!identityResult.Succeeded)
@@ -58,7 +59,7 @@ namespace BiSaji.API.Controllers
                     return BadRequest($"[{string.Join(", ", nonExistingRoles)}] roles does not exist! Please provide a valid roles.");
 
                 // If all roles exist, proceed to add the user to the specified roles
-                identityResult = await userRepository.AddRolesToUserAsync(identityUser, regiesterRequestDto.Roles);
+                identityResult = await userRepository.AddRolesToUserAsync(servant, regiesterRequestDto.Roles);
 
                 // If the user was successfully added to the roles, return a success response
                 logger.LogInformation($"User {regiesterRequestDto.FullName} regiestered successfully with roles: {string.Join(", ", regiesterRequestDto.Roles)}");
@@ -87,26 +88,23 @@ namespace BiSaji.API.Controllers
         [Route("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
         {
-            var identityUser = await userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == loginRequestDto.PhoneNumber);
+            var servant = await userManager.Users.FirstOrDefaultAsync(x => x.PhoneNumber == loginRequestDto.PhoneNumber);
 
-            if (identityUser == null)
+            if (servant == null)
                 return BadRequest("Invalid username!");
 
-            var isValidPassword = await userManager.CheckPasswordAsync(identityUser, loginRequestDto.Password);
+            var isValidPassword = await userManager.CheckPasswordAsync(servant, loginRequestDto.Password);
             if (isValidPassword)
             {
-                var roles = await userManager.GetRolesAsync(identityUser);
+                var roles = await userManager.GetRolesAsync(servant);
                 if (roles != null)
                 {
                     // Generate JWT token and return to client
-                    var jwtToken = tokenRepository.CreateTWTToken(identityUser, roles.ToList());
+                    var jwtToken = tokenRepository.CreateTWTToken(servant, roles.ToList());
 
                     var response = new LoginResponseDto
                     {
                         JwtToken = jwtToken,
-                        //UserId = identityUser.Id,
-                        //Username = identityUser.UserName,
-                        //Roles = roles.ToList()
                     };
 
                     logger.LogInformation($"User {loginRequestDto.PhoneNumber} logged in successfully with token: {jwtToken}");

@@ -2,6 +2,7 @@
 using BiSaji.API.Data;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Interfaces.ServicesInterfaces;
+using BiSaji.API.Models.Domain;
 using BiSaji.API.Repositories;
 using BiSaji.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,14 +26,14 @@ namespace BiSaji.API
             var logger = new LoggerConfiguration()
             .WriteTo.Console()
             .WriteTo.File(
-                path: "Logs/InfoLogs/NzWalks_Info_log_.txt",
+                path: "Logs/InfoLogs/BiSaji_Info_log_.txt",
                 rollingInterval: RollingInterval.Hour,
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
                 retainedFileCountLimit: 365 / 2 // keep logs for 6 months
                 )
             .MinimumLevel.Information()
             .WriteTo.File(
-                path: "Logs/Errorlogs/NzWalks_Error_log_.txt",
+                path: "Logs/Errorlogs/BiSaji_Error_log_.txt",
                 rollingInterval: RollingInterval.Hour,
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
                 retainedFileCountLimit: 365, // keep logs for 12 months
@@ -91,11 +92,6 @@ namespace BiSaji.API
                 options.UseSqlServer(builder.Configuration.GetConnectionString("BiSajiConnectionString"));
             });
 
-            builder.Services.AddDbContext<BiSajiDbAuthContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("BiSajiAuthConnectionString"));
-            });
-
             // For in-memory repository (Development purposes)
             //builder.Services.AddScoped<IRegionRepository, InMemoryRegionRepository>();
 
@@ -107,10 +103,10 @@ namespace BiSaji.API
             // TODO: Add AutoMapper
             //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
-            builder.Services.AddIdentityCore<IdentityUser>()
+            builder.Services.AddIdentityCore<Servant>()
                 .AddRoles<IdentityRole>()
-                .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("BiSajiDb")
-                .AddEntityFrameworkStores<BiSajiDbAuthContext>()
+                .AddTokenProvider<DataProtectorTokenProvider<Servant>>("BiSajiDb")
+                .AddEntityFrameworkStores<BiSajiDbContext>()
                 .AddDefaultTokenProviders();
 
             builder.Services.Configure<IdentityOptions>(options =>
@@ -135,7 +131,8 @@ namespace BiSaji.API
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ??
+                        throw new InvalidOperationException("JWT Key is not configured")))
                 });
 
             var app = builder.Build();
