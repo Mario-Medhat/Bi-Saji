@@ -45,7 +45,7 @@ namespace BiSaji.API.Controllers
                     var userDto = new UserDto
                     {
                         Id = Guid.Parse(user.Id),
-                        FullName = user.UserName,
+                        FullName = user.FullName,
                         PhoneNumber = user.PhoneNumber
                     };
                     usersDto.Add(userDto);
@@ -83,7 +83,7 @@ namespace BiSaji.API.Controllers
                 var userDto = new UserDto
                 {
                     Id = id,
-                    FullName = userDm.UserName,
+                    FullName = userDm.FullName,
                     PhoneNumber = userDm.PhoneNumber
                 };
 
@@ -154,7 +154,7 @@ namespace BiSaji.API.Controllers
                 var userDto = new UserDto
                 {
                     Id = id,
-                    FullName = servant.UserName,
+                    FullName = servant.FullName,
                     PhoneNumber = servant.PhoneNumber
                 };
 

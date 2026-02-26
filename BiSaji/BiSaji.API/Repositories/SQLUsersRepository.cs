@@ -45,7 +45,10 @@ namespace BiSaji.API.Repositories
             // Create a new Servant based on the registration details
             var servant = new Servant
             {
-                UserName = regiesterRequestDto.FullName,
+                // Assigning the phone number as the main UserName
+                UserName = regiesterRequestDto.PhoneNumber,
+                FullName = regiesterRequestDto.FullName,
+                BatchId = regiesterRequestDto.BatchId ?? null,
                 PhoneNumber = regiesterRequestDto.PhoneNumber
             };
 
@@ -61,9 +64,9 @@ namespace BiSaji.API.Repositories
             // Apply filtering if filterOn and filterQuery are provided
             if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
             {
-                if (filterOn.Equals("username", StringComparison.OrdinalIgnoreCase) || filterOn.Equals("name", StringComparison.OrdinalIgnoreCase))
+                if (filterOn.Equals("fullname", StringComparison.OrdinalIgnoreCase) || filterOn.Equals("name", StringComparison.OrdinalIgnoreCase))
                 {
-                    users = users.Where(user => EF.Functions.Like(user.UserName, $"%{filterQuery}%"));
+                    users = users.Where(user => EF.Functions.Like(user.FullName, $"%{filterQuery}%"));
                 }
                 else if (filterOn.Equals("phonenumber", StringComparison.OrdinalIgnoreCase) || filterOn.Equals("phone", StringComparison.OrdinalIgnoreCase))
                 {
@@ -94,10 +97,13 @@ namespace BiSaji.API.Repositories
 
                 // Update the user's properties based on the provided updateRequestDto
                 if (!string.IsNullOrWhiteSpace(updateRequestDto.FullName))
-                    user.UserName = updateRequestDto.FullName;
+                    user.FullName = updateRequestDto.FullName;
 
                 if (!string.IsNullOrWhiteSpace(updateRequestDto.PhoneNumber))
+                {
+                    user.UserName = updateRequestDto.PhoneNumber;
                     user.PhoneNumber = updateRequestDto.PhoneNumber;
+                }
 
                 if (!string.IsNullOrWhiteSpace(updateRequestDto.Password))
                 {

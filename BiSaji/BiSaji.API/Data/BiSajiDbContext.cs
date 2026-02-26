@@ -170,13 +170,6 @@ namespace BiSaji.API.Data
                 },
                 new IdentityRole
                 {
-                    Id = "abcdef12-3456-7890-abcd-ef1234567890",
-                    ConcurrencyStamp = "abcdef12-3456-7890-abcd-ef1234567890",
-                    Name = "BatchLeader",
-                    NormalizedName = "BATCHLEADER"
-                },
-                new IdentityRole
-                {
                     Id = "bc14dbc5-5b14-4020-8ba4-1441d4de31d0",
                     ConcurrencyStamp = "bc14dbc5-5b14-4020-8ba4-1441d4de31d0",
                     Name = "Servant",
