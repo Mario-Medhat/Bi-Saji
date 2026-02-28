@@ -1,4 +1,4 @@
-﻿namespace BiSaji.API.Models.Dto
+﻿namespace BiSaji.API.Models.Dto.Users
 {
     public class LoginResponseDto
     {

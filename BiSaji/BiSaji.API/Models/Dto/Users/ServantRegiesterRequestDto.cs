@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BiSaji.API.Models.Dto
+namespace BiSaji.API.Models.Dto.Users
 {
     public class ServantRegiesterRequestDto
     {

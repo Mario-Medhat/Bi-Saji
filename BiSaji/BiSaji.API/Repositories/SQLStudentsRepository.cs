@@ -2,7 +2,7 @@
 using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Models.Domain;
-using BiSaji.API.Models.Dto;
+using BiSaji.API.Models.Dto.Students;
 using Microsoft.EntityFrameworkCore;
 
 namespace BiSaji.API.Repositories

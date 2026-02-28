@@ -2,7 +2,7 @@
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Interfaces.ServicesInterfaces;
 using BiSaji.API.Models.Domain;
-using BiSaji.API.Models.Dto;
+using BiSaji.API.Models.Dto.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

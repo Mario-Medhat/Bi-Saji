@@ -1,7 +1,7 @@
 ﻿using BiSaji.API.Models.Domain;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BiSaji.API.Models.Dto
+namespace BiSaji.API.Models.Dto.Students
 {
     public class StudentDto
     {
