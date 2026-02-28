@@ -2,7 +2,7 @@
 
 namespace BiSaji.API.Models.Dto
 {
-    public class RegiesterRequestDto
+    public class ServantRegiesterRequestDto
     {
         [Required]
         [DataType(DataType.PhoneNumber)]

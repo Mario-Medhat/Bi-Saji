@@ -16,30 +16,22 @@ namespace BiSaji.API.Repositories
             this.userManager = userManager;
         }
 
-        public Task<IdentityResult> AddRolesToUserAsync(Servant servant, params string[] roles)
+        public async Task<IdentityResult> AddRolesToUserAsync(Servant servant, params string[] roles)
         {
-            try
-            {
-                return userManager.AddToRolesAsync(servant, roles);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
+            return await userManager.AddToRolesAsync(servant, roles);
         }
 
-        public async Task<(IdentityResult, Servant)> CreateAsync(RegiesterRequestDto regiesterRequestDto)
+        public async Task<(IdentityResult, Servant)> CreateAsync(ServantRegiesterRequestDto regiesterRequestDto)
         {
             if (regiesterRequestDto == null)
                 throw new ArgumentNullException(nameof(regiesterRequestDto));
 
             // Check if a user with the same phone number already exists
-            bool isUserAlreadyExists = userManager.Users.FirstOrDefault(u => u.PhoneNumber == regiesterRequestDto.PhoneNumber) != null;
+            bool isUserAlreadyExists = await userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == regiesterRequestDto.PhoneNumber) != null;
 
             // If a user with the same phone number exists, throw an exception
             if (isUserAlreadyExists)
-                throw new UserAlreadyExistsException(regiesterRequestDto.PhoneNumber);
+                throw new UserAlreadyExistsException($"User with phone number {regiesterRequestDto.PhoneNumber} already exists.");
 
             // Create a new Servant based on the registration details
             var servant = new Servant
@@ -81,7 +73,7 @@ namespace BiSaji.API.Repositories
             return await userManager.Users.FirstOrDefaultAsync(user => user.Id == id.ToString());
         }
 
-        public async Task<(IdentityResult, Servant)> UpdateAsync(Guid id, UpdateRequestDto updateRequestDto)
+        public async Task<(IdentityResult, Servant)> UpdateAsync(Guid id, SetvantUpdateRequestDto updateRequestDto)
         {
 
             try
@@ -91,7 +83,7 @@ namespace BiSaji.API.Repositories
 
                 if (user == null)
                 {
-                    throw new UserNotFoundException(id);
+                    throw new NotFoundException($"No user found with {nameof(id)} {id}.");
                 }
 
                 // Update the user's properties based on the provided updateRequestDto
@@ -119,9 +111,9 @@ namespace BiSaji.API.Repositories
                 return (identityResult, user);
 
             }
-            catch (UserNotFoundException unfEx)
+            catch (NotFoundException unfEx)
             {
-                throw new UserNotFoundException(id);
+                throw new NotFoundException($"No user found with {nameof(id)} {id}.");
             }
             catch (Exception ex)
             {
@@ -137,7 +129,7 @@ namespace BiSaji.API.Repositories
 
                 if (user == null)
                 {
-                    throw new UserNotFoundException(id);
+                    throw new NotFoundException($"No user found with {nameof(id)} {id}.");
                 }
 
                 var identityResult = await userManager.DeleteAsync(user);
@@ -148,9 +140,9 @@ namespace BiSaji.API.Repositories
 
                 return (identityResult, user);
             }
-            catch (UserNotFoundException unfEx)
+            catch (NotFoundException unfEx)
             {
-                throw new UserNotFoundException(id);
+                throw new NotFoundException($"No user found with {nameof(id)} {id}.");
             }
             catch (Exception ex)
             {

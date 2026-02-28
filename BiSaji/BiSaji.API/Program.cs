@@ -1,11 +1,13 @@
 
 using BiSaji.API.Data;
+using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Interfaces.ServicesInterfaces;
 using BiSaji.API.Models.Domain;
 using BiSaji.API.Repositories;
 using BiSaji.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -99,6 +101,7 @@ namespace BiSaji.API
             builder.Services.AddScoped<ITokenRepository, SQLTokenRepository>();
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IUserRepository, SQLUsersRepository>();
+            builder.Services.AddScoped<IStudentsRepository, SQLStudentsRepository>();
 
             // TODO: Add AutoMapper
             //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
@@ -150,6 +153,30 @@ namespace BiSaji.API
             }
 
             app.UseHttpsRedirection();
+
+            app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
+                {
+                    var exceptionHandler = context.Features.Get<IExceptionHandlerFeature>();
+                    var exception = exceptionHandler?.Error;
+
+                    context.Response.ContentType = "application/json";
+                    context.Response.StatusCode = exception switch
+                    {
+                        NotFoundException => StatusCodes.Status404NotFound,
+                        _ => StatusCodes.Status500InternalServerError
+                    };
+
+                    await context.Response.WriteAsJsonAsync(new
+                    {
+                        message = exception?.Message
+                    });
+                });
+            });
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseAuthentication();
             app.UseAuthorization();

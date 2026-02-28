@@ -76,7 +76,7 @@ namespace BiSaji.API.Controllers
                 // if user is null, return not found
                 if (userDm == null)
                 {
-                    throw new UserNotFoundException(id);
+                    throw new NotFoundException($"No user found with {nameof(id)} {id}.");
                 }
 
                 // Mapping identity user to user dto
@@ -92,7 +92,7 @@ namespace BiSaji.API.Controllers
                 return Ok(userDto);
             }
 
-            catch (UserNotFoundException unfEx)
+            catch (NotFoundException unfEx)
             {
                 logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
                 return StatusCode(StatusCodes.Status404NotFound, unfEx.Message);
@@ -109,7 +109,7 @@ namespace BiSaji.API.Controllers
         [HttpPost]
         [Route("Register")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Register([FromBody] RegiesterRequestDto regiesterRequestDto)
+        public async Task<IActionResult> Register([FromBody] ServantRegiesterRequestDto regiesterRequestDto)
         {
             try
             {
@@ -133,11 +133,11 @@ namespace BiSaji.API.Controllers
             }
         }
 
-        // Put: api/Users/UPDATE
+        // Put: api/Users/UPDATE/{id}
         [HttpPut]
         [Route("Update/{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRequestDto updateRequestDto)
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] SetvantUpdateRequestDto updateRequestDto)
         {
             try
             {

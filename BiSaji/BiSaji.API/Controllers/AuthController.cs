@@ -37,7 +37,7 @@ namespace BiSaji.API.Controllers
         // POST: api/Auth/Regiester
         [HttpPost]
         [Route("Register")]
-        public async Task<IActionResult> Register([FromBody] RegiesterRequestDto regiesterRequestDto)
+        public async Task<IActionResult> Register([FromBody] ServantRegiesterRequestDto regiesterRequestDto)
         {
             try
             {

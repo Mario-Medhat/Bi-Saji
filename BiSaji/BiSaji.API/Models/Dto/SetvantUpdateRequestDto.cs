@@ -2,7 +2,7 @@
 
 namespace BiSaji.API.Models.Dto
 {
-    public class UpdateRequestDto
+    public class SetvantUpdateRequestDto
     {
         [DataType(DataType.PhoneNumber)]
         public string? PhoneNumber { get; set; }
