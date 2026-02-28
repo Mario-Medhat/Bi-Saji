@@ -167,5 +167,39 @@ namespace BiSaji.API.Controllers
                 return BadRequest($"Failed to update user! Error: {ex.Message}");
             }
         }
+
+        // Delete: api/Users/Delete
+        [HttpDelete]
+        [Route("Delete/{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            try
+            {
+                (var identityResult, var servant) = await userRepository.DeleteAsync(id);
+
+                if (!identityResult.Succeeded)
+                {
+                    logger.LogError($"Failed to delete user with id {id} Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                    return BadRequest($"Failed to delete user! Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                }
+
+                // Mapping identity user to user dto
+                var userDto = new UserDto
+                {
+                    Id = id,
+                    FullName = servant.FullName,
+                    PhoneNumber = servant.PhoneNumber
+                };
+
+                logger.LogInformation($"User {servant.FullName} deleted successfully");
+                return Ok($"User deleted successfully! \n\n{JsonSerializer.Serialize(userDto, new JsonSerializerOptions { WriteIndented = true })}");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Failed to delete user with id {id} Error: {ex.Message}");
+                return BadRequest($"Failed to delete user! Error: {ex.Message}");
+            }
+        }
     }
 }

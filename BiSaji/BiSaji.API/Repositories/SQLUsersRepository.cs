@@ -1,5 +1,4 @@
 ﻿using BiSaji.API.Exceptions;
-using BiSaji.API.Interfaces;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Models.Domain;
 using BiSaji.API.Models.Dto;
@@ -87,7 +86,7 @@ namespace BiSaji.API.Repositories
 
             try
             {
-                var user = await userManager.Users.FirstOrDefaultAsync(user => user.Id == id.ToString());
+                var user = await GetByIdAsync(id);
 
 
                 if (user == null)
@@ -130,10 +129,33 @@ namespace BiSaji.API.Repositories
             }
         }
 
-        public Task<Servant?> DeleteAsync(Guid id)
+        public async Task<(IdentityResult, Servant?)> DeleteAsync(Guid id)
         {
-            // TODO: Implement the logic to delete a user by their ID
-            throw new NotImplementedException();
+            try
+            {
+                var user = await GetByIdAsync(id);
+
+                if (user == null)
+                {
+                    throw new UserNotFoundException(id);
+                }
+
+                var identityResult = await userManager.DeleteAsync(user);
+                if (!identityResult.Succeeded)
+                {
+                    throw new Exception("Failed to delete the user.");
+                }
+
+                return (identityResult, user);
+            }
+            catch (UserNotFoundException unfEx)
+            {
+                throw new UserNotFoundException(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

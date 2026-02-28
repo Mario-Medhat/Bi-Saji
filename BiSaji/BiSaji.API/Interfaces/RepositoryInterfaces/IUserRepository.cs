@@ -10,7 +10,7 @@ namespace BiSaji.API.Interfaces.RepositoryInterfaces
         public Task<Servant?> GetByIdAsync(Guid id);
         public Task<(IdentityResult, Servant)> CreateAsync(RegiesterRequestDto regiesterRequestDto);
         public Task<(IdentityResult, Servant)> UpdateAsync(Guid id, UpdateRequestDto updateRequestDto);
-        public Task<Servant?> DeleteAsync(Guid id);
+        public Task<(IdentityResult, Servant?)> DeleteAsync(Guid id);
         public Task<IdentityResult> AddRolesToUserAsync(Servant servant, params string[] roles);
 
     }
