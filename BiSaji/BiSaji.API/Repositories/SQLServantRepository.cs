@@ -1,9 +1,13 @@
 ﻿using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Models.Domain;
+using BiSaji.API.Models.Dto.Auth;
+using BiSaji.API.Models.Dto.Servant;
 using BiSaji.API.Models.Dto.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace BiSaji.API.Repositories
 {
@@ -96,16 +100,6 @@ namespace BiSaji.API.Repositories
                     user.PhoneNumber = updateRequestDto.PhoneNumber;
                 }
 
-                if (!string.IsNullOrWhiteSpace(updateRequestDto.Password))
-                {
-                    var token = await userManager.GeneratePasswordResetTokenAsync(user);
-                    var passwordResetResult = await userManager.ResetPasswordAsync(user, token, updateRequestDto.Password);
-                    if (!passwordResetResult.Succeeded)
-                    {
-                        throw new Exception("Failed to reset the user's password.");
-                    }
-                }
-
                 var identityResult = await userManager.UpdateAsync(user);
 
                 return (identityResult, user);
@@ -143,6 +137,56 @@ namespace BiSaji.API.Repositories
             catch (NotFoundException unfEx)
             {
                 throw new NotFoundException($"No user found with {nameof(id)} {id}.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        public async Task<Servant> ChangePasswordAsync(ClaimsPrincipal user, ChangePasswordRequestDto changePasswordRequestDto)
+        {
+            var userId = user.FindFirstValue(JwtRegisteredClaimNames.Sub) ?? user.FindFirstValue(ClaimTypes.NameIdentifier);
+            Servant servant = await userManager.FindByIdAsync(userId);
+
+            // Check if the user exists and if the current password is correct
+            if (servant != null)
+                if (!await userManager.CheckPasswordAsync(servant, changePasswordRequestDto.CurrentPassword))
+                {
+                    throw new InvalidDataException($"The current password is not correct.");
+                }
+
+            return await ChangePasswordAsync(servant, changePasswordRequestDto);
+        }
+        public async Task<Servant> ChangePasswordAsync(Guid id, BasePasswordRequestDto changePasswordRequestDto)
+        {
+            Servant servant = await GetByIdAsync(id);
+            return await ChangePasswordAsync(servant, changePasswordRequestDto);
+        }
+        public async Task<Servant> ChangePasswordAsync(Servant? servant, BasePasswordRequestDto changePasswordRequestDto)
+        {
+            try
+            {
+                if (servant == null)
+                {
+                    throw new NotFoundException($"No user found with {nameof(servant.Id)} {servant!.Id}.");
+                }
+
+                if (!string.IsNullOrWhiteSpace(changePasswordRequestDto.NewPassword))
+                {
+                    var token = await userManager.GeneratePasswordResetTokenAsync(servant);
+                    var passwordResetResult = await userManager.ResetPasswordAsync(servant, token, changePasswordRequestDto.NewPassword);
+                    if (!passwordResetResult.Succeeded)
+                    {
+                        throw new Exception("Failed to reset the user's password.");
+                    }
+                }
+                return servant;
+            }
+            catch (NotFoundException unfEx)
+            {
+                throw new NotFoundException($"No user found with {nameof(servant.Id)} {servant!.Id}.");
             }
             catch (Exception ex)
             {

@@ -1,6 +1,7 @@
 ﻿using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Models.Domain;
+using BiSaji.API.Models.Dto.Servant;
 using BiSaji.API.Models.Dto.Users;
 using BiSaji.API.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -32,7 +33,7 @@ namespace BiSaji.API.Controllers
                 var usersDto = await _servantService.GetAllAsync(filterOn, filterQuery);
                 return Ok(usersDto);
             }
-            catch (Exception ex)
+            catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request. Please try again later.");
             }
@@ -55,7 +56,7 @@ namespace BiSaji.API.Controllers
             {
                 return NotFound(unfEx.Message);
             }
-            catch (Exception ex)
+            catch
             {
 
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request. Please try again later.");
@@ -115,6 +116,26 @@ namespace BiSaji.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Failed to delete user! Error: {ex.Message}");
+            }
+        }
+
+        // PUT: api/Servants/{id}/ChangePassword
+        [HttpPut("{id:guid}/ChangePassword")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ChangePassword([FromRoute] Guid id, [FromBody] BasePasswordRequestDto changePasswordRequestDto)
+        {
+            try
+            {
+                await _servantService.ChangePasswordAsync(id, changePasswordRequestDto);
+                return Ok("Password changed successfully!");
+            }
+            catch (NotFoundException unfEx)
+            {
+                return NotFound(unfEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to change password! Error: {ex.Message}");
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BiSaji.API.Models.Dto.Users
+namespace BiSaji.API.Models.Dto.Auth
 {
     public class LoginRequestDto
     {

@@ -2,21 +2,24 @@
 using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Models.Domain;
+using BiSaji.API.Models.Dto.Auth;
+using BiSaji.API.Models.Dto.Servant;
 using BiSaji.API.Models.Dto.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace BiSaji.API.Services
 {
     public class ServantService
     {
-        private readonly IServantRepository _servantRepository;
+        private readonly IServantRepository servantRepository;
         private readonly ILogger<ServantService> logger;
 
         public ServantService(IServantRepository servantRepository, ILogger<ServantService> logger)
         {
-            _servantRepository = servantRepository;
+            this.servantRepository = servantRepository;
             this.logger = logger;
         }
 
@@ -24,7 +27,7 @@ namespace BiSaji.API.Services
         {
             try
             {
-                var servantDm = await _servantRepository.GetAllAsync(filterOn, filterQuery);
+                var servantDm = await servantRepository.GetAllAsync(filterOn, filterQuery);
 
                 // TODO: Create a auto mapper profile to map identity user to user dto and return the list of user dto instead of identity user
                 var servantDto = new List<ServantDto>();
@@ -56,7 +59,7 @@ namespace BiSaji.API.Services
             try
             {
                 // get user by id from user repository
-                var servantDm = await _servantRepository.GetByIdAsync(id);
+                var servantDm = await servantRepository.GetByIdAsync(id);
 
                 // if user is null, return not found
                 if (servantDm == null)
@@ -94,7 +97,7 @@ namespace BiSaji.API.Services
             try
             {
                 // create user with user repository and return the result
-                (var identityResult, var servant) = await _servantRepository.CreateAsync(regiesterRequestDto);
+                (var identityResult, var servant) = await servantRepository.CreateAsync(regiesterRequestDto);
 
                 if (!identityResult.Succeeded)
                 {
@@ -118,7 +121,7 @@ namespace BiSaji.API.Services
             try
             {
                 // create user with user repository and return the result
-                (var identityResult, var servantDm) = await _servantRepository.UpdateAsync(id, updateRequestDto);
+                (var identityResult, var servantDm) = await servantRepository.UpdateAsync(id, updateRequestDto);
 
                 if (!identityResult.Succeeded)
                 {
@@ -158,7 +161,7 @@ namespace BiSaji.API.Services
         {
             try
             {
-                (var identityResult, var servantDm) = await _servantRepository.DeleteAsync(id);
+                (var identityResult, var servantDm) = await servantRepository.DeleteAsync(id);
 
                 if (!identityResult.Succeeded)
                 {
@@ -186,6 +189,40 @@ namespace BiSaji.API.Services
             {
                 logger.LogError($"Failed to delete user with id {id} Error: {ex.Message}");
                 throw;
+            }
+        }
+        public async Task<Servant> ChangePasswordAsync(ClaimsPrincipal user, ChangePasswordRequestDto changePasswordRequestDto)
+        {
+            return await servantRepository.ChangePasswordAsync(user, changePasswordRequestDto);
+        }
+        public async Task<Servant> ChangePasswordAsync(Guid id, BasePasswordRequestDto changePasswordRequestDto)
+        {
+            return await servantRepository.ChangePasswordAsync(id, changePasswordRequestDto);
+        }
+        public async Task<Servant> ChangePasswordAsync(Servant servantDm, BasePasswordRequestDto changePasswordRequestDto)
+        {
+            try
+            {
+                // create user with user repository and return the result
+                servantDm = await servantRepository.ChangePasswordAsync(servantDm, changePasswordRequestDto);
+
+                logger.LogInformation($"User {servantDm.FullName} updated successfully");
+                return servantDm;
+            }
+            catch (NotFoundException unfEx)
+            {
+                logger.LogWarning($"User with id {servantDm.Id} not found in database. Exception: {unfEx.Message}");
+                throw;
+            }
+            catch (ArgumentException argEx)
+            {
+                logger.LogWarning(argEx, "Invalid input data for student registration.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Failed to update user with id {servantDm.Id} Error: {ex.Message}");
+                throw new Exception($"Failed to update user! Error: {ex.Message}");
             }
         }
     }

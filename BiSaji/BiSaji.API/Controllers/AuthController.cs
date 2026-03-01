@@ -2,11 +2,15 @@
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Interfaces.ServicesInterfaces;
 using BiSaji.API.Models.Domain;
+using BiSaji.API.Models.Dto.Auth;
+using BiSaji.API.Models.Dto.Servant;
 using BiSaji.API.Models.Dto.Users;
 using BiSaji.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BiSaji.API.Controllers
 {
@@ -31,7 +35,7 @@ namespace BiSaji.API.Controllers
                 await authService.RegisterAsync(regiesterRequestDto);
                 return Ok("User registered successfully!");
             }
-            catch (Exception ex)
+            catch
             {
                 return BadRequest("An error occurred while processing your request. Please try again later.");
             }
@@ -44,12 +48,32 @@ namespace BiSaji.API.Controllers
         {
             try
             {
-                var response = authService.LoginAsync(loginRequestDto);
+                var response = await authService.LoginAsync(loginRequestDto);
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        // PUT: api/Auth/ChangePassword
+        [HttpPut("ChangePassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto changePasswordRequestDto)
+        {
+            try
+            {
+                await authService.ChangePasswordAsync(User, changePasswordRequestDto);
+                return Ok("Password changed successfully!");
+            }
+            catch (NotFoundException unfEx)
+            {
+                return NotFound(unfEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to change password! Error: {ex.Message}");
             }
         }
     }

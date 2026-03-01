@@ -2,10 +2,13 @@
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Interfaces.ServicesInterfaces;
 using BiSaji.API.Models.Domain;
+using BiSaji.API.Models.Dto.Auth;
+using BiSaji.API.Models.Dto.Servant;
 using BiSaji.API.Models.Dto.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BiSaji.API.Services
 {
@@ -14,20 +17,15 @@ namespace BiSaji.API.Services
         private readonly UserManager<Servant> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ITokenRepository tokenRepository;
-        private readonly IServantRepository userRepository;
-        private readonly IRoleService roleService;
         private readonly ServantService servantService;
         private readonly ILogger<AuthService> logger;
 
         public AuthService(UserManager<Servant> userManager, RoleManager<IdentityRole> roleManager,
-            ITokenRepository tokenRepository, IServantRepository userRepository, IRoleService roleService,
-            ServantService servantService, ILogger<AuthService> logger)
+            ITokenRepository tokenRepository, ServantService servantService, ILogger<AuthService> logger)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.tokenRepository = tokenRepository;
-            this.userRepository = userRepository;
-            this.roleService = roleService;
             this.servantService = servantService;
             this.logger = logger;
         }
@@ -78,8 +76,14 @@ namespace BiSaji.API.Services
             catch (Exception ex)
             {
                 logger.LogError(ex, $"An error occurred during login for user {loginRequestDto.PhoneNumber}: {ex.Message}");
-                throw;
+                throw new Exception(ex.Message);
             }
+        }
+
+        internal async Task ChangePasswordAsync(ClaimsPrincipal user, ChangePasswordRequestDto changePasswordRequestDto)
+        {
+
+            await servantService.ChangePasswordAsync(user, changePasswordRequestDto);
         }
     }
 }

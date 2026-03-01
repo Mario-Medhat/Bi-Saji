@@ -21,6 +21,7 @@ namespace BiSaji.API.Repositories
             // Create claims based on the user information and roles
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, identityUser.Id),
                 new Claim(ClaimTypes.MobilePhone, identityUser.PhoneNumber),
             };
             foreach (var role in roles)
