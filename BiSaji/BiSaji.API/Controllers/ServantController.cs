@@ -13,11 +13,11 @@ namespace BiSaji.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class ServantsController : ControllerBase
+    public class ServantController : ControllerBase
     {
         private readonly ServantService _servantService;
 
-        public ServantsController(ServantService servantService)
+        public ServantController(ServantService servantService)
         {
             _servantService = servantService;
         }

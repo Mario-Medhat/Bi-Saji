@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BiSaji.API.Repositories
 {
-    public class SQLStudentsRepository : IStudentsRepository
+    public class SQLStudentRepository : IStudentRepository
     {
         private readonly BiSajiDbContext dbContext;
 
-        public SQLStudentsRepository(BiSajiDbContext dbContext)
+        public SQLStudentRepository(BiSajiDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

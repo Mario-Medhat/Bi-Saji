@@ -16,12 +16,12 @@ namespace BiSaji.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StudentsController : ControllerBase
+    public class StudentController : ControllerBase
     {
-        private readonly IStudentsRepository studentsRepository;
+        private readonly IStudentRepository studentsRepository;
         private readonly ILogger logger;
 
-        public StudentsController(IStudentsRepository studentsRepository, ILogger<StudentsController> logger)
+        public StudentController(IStudentRepository studentsRepository, ILogger<StudentController> logger)
         {
             this.studentsRepository = studentsRepository;
             this.logger = logger;

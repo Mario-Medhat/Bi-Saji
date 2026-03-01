@@ -100,8 +100,8 @@ namespace BiSaji.API
             // For SQL repository (Production purposes)
             builder.Services.AddScoped<ITokenRepository, SQLTokenRepository>();
             builder.Services.AddScoped<IRoleService, RoleService>();
-            builder.Services.AddScoped<IServantRepository, SQLServantsRepository>();
-            builder.Services.AddScoped<IStudentsRepository, SQLStudentsRepository>();
+            builder.Services.AddScoped<IServantRepository, SQLServantRepository>();
+            builder.Services.AddScoped<IStudentRepository, SQLStudentRepository>();
 
             builder.Services.AddScoped<ServantService>();
 
