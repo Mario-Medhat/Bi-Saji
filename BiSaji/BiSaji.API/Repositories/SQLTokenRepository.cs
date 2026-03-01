@@ -37,7 +37,7 @@ namespace BiSaji.API.Repositories
                 issuer: configuration["Jwt:Issuer"],
                 audience: configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddMinutes(60), // TODO: Adjust the time as per your requirement
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

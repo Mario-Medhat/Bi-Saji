@@ -100,8 +100,10 @@ namespace BiSaji.API
             // For SQL repository (Production purposes)
             builder.Services.AddScoped<ITokenRepository, SQLTokenRepository>();
             builder.Services.AddScoped<IRoleService, RoleService>();
-            builder.Services.AddScoped<IUserRepository, SQLUsersRepository>();
+            builder.Services.AddScoped<IServantRepository, SQLServantsRepository>();
             builder.Services.AddScoped<IStudentsRepository, SQLStudentsRepository>();
+
+            builder.Services.AddScoped<ServantService>();
 
             // TODO: Add AutoMapper
             //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));

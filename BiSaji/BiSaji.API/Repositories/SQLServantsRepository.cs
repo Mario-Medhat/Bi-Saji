@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BiSaji.API.Repositories
 {
-    public class SQLUsersRepository : IUserRepository
+    public class SQLServantsRepository : IServantRepository
     {
         private readonly UserManager<Servant> userManager;
 
-        public SQLUsersRepository(UserManager<Servant> userManager)
+        public SQLServantsRepository(UserManager<Servant> userManager)
         {
             this.userManager = userManager;
         }

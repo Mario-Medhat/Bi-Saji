@@ -50,7 +50,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("LeaderId");
 
-                    b.ToTable("Batches");
+                    b.ToTable("Batches", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.Day", b =>
@@ -81,7 +81,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("CreatedByServantId");
 
-                    b.ToTable("Days");
+                    b.ToTable("Days", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.MovementGroup", b =>
@@ -108,7 +108,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("ResponsibleServantId");
 
-                    b.ToTable("MovementGroups");
+                    b.ToTable("MovementGroups", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.Period", b =>
@@ -130,7 +130,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("DayId");
 
-                    b.ToTable("Periods");
+                    b.ToTable("Periods", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.PeriodAssignment", b =>
@@ -156,7 +156,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("PeriodAssignments");
+                    b.ToTable("PeriodAssignments", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.Place", b =>
@@ -175,7 +175,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Places");
+                    b.ToTable("Places", (string)null);
 
                     b.HasData(
                         new
@@ -232,7 +232,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("PlaceId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.RoomAssignment", b =>
@@ -259,7 +259,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("ServantId");
 
-                    b.ToTable("RoomAssignments");
+                    b.ToTable("RoomAssignments", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.RoomRole", b =>
@@ -275,7 +275,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RoomRoles");
+                    b.ToTable("RoomRoles", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.Servant", b =>
@@ -386,7 +386,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("BatchId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("DayLeaders", b =>
@@ -401,7 +401,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("DayLeadersId");
 
-                    b.ToTable("DayLeaders");
+                    b.ToTable("DayLeaders", (string)null);
                 });
 
             modelBuilder.Entity("DayServants", b =>
@@ -416,7 +416,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("DayServantsId");
 
-                    b.ToTable("DayServants");
+                    b.ToTable("DayServants", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -587,7 +587,7 @@ namespace BiSaji.API.Migrations
 
                     b.HasIndex("StudentsId");
 
-                    b.ToTable("MovementGroupStudents");
+                    b.ToTable("MovementGroupStudents", (string)null);
                 });
 
             modelBuilder.Entity("BiSaji.API.Models.Domain.Batch", b =>

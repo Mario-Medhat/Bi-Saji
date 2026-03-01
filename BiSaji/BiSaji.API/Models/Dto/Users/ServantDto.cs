@@ -2,7 +2,7 @@
 
 namespace BiSaji.API.Models.Dto.Users
 {
-    public class UserDto
+    public class ServantDto
     {
         public Guid Id { get; set; }
 

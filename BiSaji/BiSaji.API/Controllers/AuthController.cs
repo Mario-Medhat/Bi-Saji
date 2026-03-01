@@ -3,11 +3,9 @@ using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Interfaces.ServicesInterfaces;
 using BiSaji.API.Models.Domain;
 using BiSaji.API.Models.Dto.Users;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Principal;
 
 namespace BiSaji.API.Controllers
 {
@@ -18,12 +16,13 @@ namespace BiSaji.API.Controllers
         private readonly UserManager<Servant> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly ITokenRepository tokenRepository;
-        private readonly IUserRepository userRepository;
+        private readonly IServantRepository userRepository;
         private readonly IRoleService roleService;
         private readonly ILogger<AuthController> logger;
 
+        // TODO: Implement a AuthService to handle the authentication logic and move the code from controller to service to make the controller thin and maintainable
         public AuthController(UserManager<Servant> userManager, RoleManager<IdentityRole> roleManager,
-            ITokenRepository tokenRepository, IUserRepository userRepository, IRoleService roleService, ILogger<AuthController> logger)
+            ITokenRepository tokenRepository, IServantRepository userRepository, IRoleService roleService, ILogger<AuthController> logger)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;

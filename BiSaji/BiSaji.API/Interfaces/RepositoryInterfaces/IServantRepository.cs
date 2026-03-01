@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BiSaji.API.Interfaces.RepositoryInterfaces
 {
-    public interface IUserRepository
+    public interface IServantRepository
     {
         public Task<IEnumerable<Servant>> GetAllAsync(string? filterOn, string? filterQuery);
         public Task<Servant?> GetByIdAsync(Guid id);
