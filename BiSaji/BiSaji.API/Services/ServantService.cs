@@ -12,12 +12,12 @@ namespace BiSaji.API.Services
     public class ServantService
     {
         private readonly IServantRepository _servantRepository;
-        private readonly ILogger<ServantService> _logger;
+        private readonly ILogger<ServantService> logger;
 
         public ServantService(IServantRepository servantRepository, ILogger<ServantService> logger)
         {
             _servantRepository = servantRepository;
-            _logger = logger;
+            this.logger = logger;
         }
 
         public async Task<List<ServantDto>> GetAllAsync(string? filterOn, string? filterQuery)
@@ -40,13 +40,13 @@ namespace BiSaji.API.Services
                     servantDto.Add(userDto);
                 }
 
-                _logger.LogInformation($"Got {servantDto.Count()} Users from database with filterOn: {filterOn} and filterQuery: {filterQuery}");
+                logger.LogInformation($"Got {servantDto.Count()} Users from database with filterOn: {filterOn} and filterQuery: {filterQuery}");
 
                 return servantDto;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred while getting users from database with filterOn: {filterOn} and filterQuery: {filterQuery}. Error: {ex.Message}");
+                logger.LogError($"An error occurred while getting users from database with filterOn: {filterOn} and filterQuery: {filterQuery}. Error: {ex.Message}");
                 throw new Exception("An error occurred while processing your request. Please try again later.");
             }
         }
@@ -73,18 +73,18 @@ namespace BiSaji.API.Services
                 };
 
                 // if user is found, return the user
-                _logger.LogInformation($"Returning user with id {id}\n User returned:\n{JsonSerializer.Serialize(servantDm)}");
+                logger.LogInformation($"Returning user with id {id}\n User returned:\n{JsonSerializer.Serialize(servantDm)}");
                 return servantDto;
             }
             catch (NotFoundException unfEx)
             {
-                _logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
+                logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
                 throw;
             }
             catch (Exception ex)
             {
 
-                _logger.LogError($"An error occurred while getting user with id {id} from database. Error: {ex.Message}");
+                logger.LogError($"An error occurred while getting user with id {id} from database. Error: {ex.Message}");
                 throw;
             }
         }
@@ -98,16 +98,16 @@ namespace BiSaji.API.Services
 
                 if (!identityResult.Succeeded)
                 {
-                    _logger.LogError($"Failed to regiester user {regiesterRequestDto.FullName} with roles: {string.Join(", ", regiesterRequestDto.Roles)}. Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                    logger.LogError($"Failed to regiester user {regiesterRequestDto.FullName} with roles: {string.Join(", ", regiesterRequestDto.Roles)}. Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
                     throw new Exception($"Failed to regiester user! Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
                 }
 
-                _logger.LogInformation($"User {regiesterRequestDto.FullName} regiestered successfully with roles: {string.Join(", ", regiesterRequestDto.Roles)}");
+                logger.LogInformation($"User {regiesterRequestDto.FullName} regiestered successfully with roles: {string.Join(", ", regiesterRequestDto.Roles)}");
                 return;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to regiester user {regiesterRequestDto.FullName} with roles: {string.Join(", ", regiesterRequestDto.Roles)}. Error: {ex.Message}");
+                logger.LogError($"Failed to regiester user {regiesterRequestDto.FullName} with roles: {string.Join(", ", regiesterRequestDto.Roles)}. Error: {ex.Message}");
                 throw new Exception($"Failed to regiester user! Error: {ex.Message}");
 
             }
@@ -122,7 +122,7 @@ namespace BiSaji.API.Services
 
                 if (!identityResult.Succeeded)
                 {
-                    _logger.LogError($"Failed to update user with id {id} Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                    logger.LogError($"Failed to update user with id {id} Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
                     throw new Exception($"Failed to update user! Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
                 }
 
@@ -134,17 +134,22 @@ namespace BiSaji.API.Services
                     PhoneNumber = servantDm.PhoneNumber!
                 };
 
-                _logger.LogInformation($"User {servantDto.FullName} updated successfully");
+                logger.LogInformation($"User {servantDto.FullName} updated successfully");
                 return servantDto;
             }
             catch (NotFoundException unfEx)
             {
-                _logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
+                logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
+                throw;
+            }
+            catch (ArgumentException argEx)
+            {
+                logger.LogWarning(argEx, "Invalid input data for student registration.");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to update user with id {id} Error: {ex.Message}");
+                logger.LogError($"Failed to update user with id {id} Error: {ex.Message}");
                 throw new Exception($"Failed to update user! Error: {ex.Message}");
             }
         }
@@ -157,7 +162,7 @@ namespace BiSaji.API.Services
 
                 if (!identityResult.Succeeded)
                 {
-                    _logger.LogError($"Failed to delete user with id {id} Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                    logger.LogError($"Failed to delete user with id {id} Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
                     throw new Exception($"Failed to delete user! Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
                 }
 
@@ -169,17 +174,17 @@ namespace BiSaji.API.Services
                     PhoneNumber = servantDm.PhoneNumber!
                 };
 
-                _logger.LogInformation($"User {servantDm.FullName} deleted successfully");
+                logger.LogInformation($"User {servantDm.FullName} deleted successfully");
                 return servantDto;
             }
             catch (NotFoundException unfEx)
             {
-                _logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
+                logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to delete user with id {id} Error: {ex.Message}");
+                logger.LogError($"Failed to delete user with id {id} Error: {ex.Message}");
                 throw;
             }
         }

@@ -103,7 +103,9 @@ namespace BiSaji.API
             builder.Services.AddScoped<IServantRepository, SQLServantRepository>();
             builder.Services.AddScoped<IStudentRepository, SQLStudentRepository>();
 
+            // Services
             builder.Services.AddScoped<ServantService>();
+            builder.Services.AddScoped<StudentService>();
 
             // TODO: Add AutoMapper
             //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
