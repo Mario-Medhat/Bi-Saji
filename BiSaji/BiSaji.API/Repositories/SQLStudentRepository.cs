@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BiSaji.API.Repositories
 {
+    // TODO: Use DMs instead of DTOs 
     public class SQLStudentRepository : IStudentRepository
     {
         private readonly BiSajiDbContext dbContext;

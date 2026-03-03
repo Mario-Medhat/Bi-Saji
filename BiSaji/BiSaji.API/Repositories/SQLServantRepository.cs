@@ -11,6 +11,7 @@ using System.Security.Claims;
 
 namespace BiSaji.API.Repositories
 {
+    // TODO: Use DMs instead of DTOs 
     public class SQLServantRepository : IServantRepository
     {
         private readonly UserManager<Servant> userManager;
