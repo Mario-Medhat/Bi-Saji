@@ -67,7 +67,9 @@ namespace BiSaji.API.Repositories
 
         public async Task<IEnumerable<Servant>> GetAllAsync(string? filterOn, string? filterQuery)
         {
-            var users = userManager.Users.AsQueryable();
+            var users = userManager.Users
+                .AsNoTracking() // Avoid tracking for read-only operations to improve performance
+                .AsQueryable();
 
             // Apply filtering if filterOn and filterQuery are provided
             if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)

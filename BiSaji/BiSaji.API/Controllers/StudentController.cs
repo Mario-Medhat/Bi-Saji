@@ -28,7 +28,7 @@ namespace BiSaji.API.Controllers
 
         // GET: api/Students
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetAllAsync([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
+        public async Task<ActionResult<IEnumerable<Student>>> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
         {
             try
             {
@@ -40,7 +40,6 @@ namespace BiSaji.API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-
         }
 
         // GET: api/Students/{id}

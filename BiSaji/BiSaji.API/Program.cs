@@ -102,11 +102,13 @@ namespace BiSaji.API
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<IServantRepository, SQLServantRepository>();
             builder.Services.AddScoped<IStudentRepository, SQLStudentRepository>();
+            builder.Services.AddScoped<IBatchRepository, SQLBatchRepository>();
 
             // Services
+            builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<ServantService>();
             builder.Services.AddScoped<StudentService>();
-            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<BatchService>();
 
             // TODO: Add AutoMapper
             //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));

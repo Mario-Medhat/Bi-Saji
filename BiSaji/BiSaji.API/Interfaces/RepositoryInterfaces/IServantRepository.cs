@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace BiSaji.API.Interfaces.RepositoryInterfaces
 {
+    // TODO: move servant mapping logic to a separate service and use that service in the controller instead of the repository.
     public interface IServantRepository
     {
         public Task<IEnumerable<Servant>> GetAllAsync(string? filterOn, string? filterQuery);
