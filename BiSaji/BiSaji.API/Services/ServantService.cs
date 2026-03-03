@@ -7,6 +7,7 @@ using BiSaji.API.Models.Dto.Servant;
 using BiSaji.API.Models.Dto.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -27,25 +28,26 @@ namespace BiSaji.API.Services
         {
             try
             {
-                var servantDm = await servantRepository.GetAllAsync(filterOn, filterQuery);
+                var servantsDm = await servantRepository.GetAllAsync(filterOn, filterQuery);
 
                 // TODO: Create a auto mapper profile to map identity user to user dto and return the list of user dto instead of identity user
-                var servantDto = new List<ServantDto>();
-                foreach (var user in servantDm)
+                var servantsDto = new List<ServantDto>();
+                foreach (var servantDm in servantsDm)
                 {
                     // Mapping identity user to user dto
-                    var userDto = new ServantDto
+                    var servantDto = new ServantDto
                     {
-                        Id = Guid.Parse(user.Id),
-                        FullName = user.FullName,
-                        PhoneNumber = user.PhoneNumber!
+                        Id = Guid.Parse(servantDm.Id),
+                        FullName = servantDm.FullName,
+                        PhoneNumber = servantDm.PhoneNumber!,
+                        Roles = await servantRepository.GetRolesAsync(servantDm)
                     };
-                    servantDto.Add(userDto);
+                    servantsDto.Add(servantDto);
                 }
 
-                logger.LogInformation($"Got {servantDto.Count()} Users from database with filterOn: {filterOn} and filterQuery: {filterQuery}");
+                logger.LogInformation($"Got {servantsDto.Count()} Users from database with filterOn: {filterOn} and filterQuery: {filterQuery}");
 
-                return servantDto;
+                return servantsDto;
             }
             catch (Exception ex)
             {
@@ -72,7 +74,8 @@ namespace BiSaji.API.Services
                 {
                     Id = id,
                     FullName = servantDm.FullName,
-                    PhoneNumber = servantDm.PhoneNumber!
+                    PhoneNumber = servantDm.PhoneNumber!,
+                    Roles = await servantRepository.GetRolesAsync(servantDm)
                 };
 
                 // if user is found, return the user
@@ -94,10 +97,12 @@ namespace BiSaji.API.Services
 
         public async Task RegisterAsync(ServantRegiesterRequestDto regiesterRequestDto)
         {
+            IdentityResult identityResult = new IdentityResult();
+
             try
             {
-                // create user with user repository and return the result
-                (var identityResult, var servant) = await servantRepository.CreateAsync(regiesterRequestDto);
+                // create user with user repository
+                (identityResult, var servant) = await servantRepository.CreateAsync(regiesterRequestDto);
 
                 if (!identityResult.Succeeded)
                 {
@@ -110,8 +115,18 @@ namespace BiSaji.API.Services
             }
             catch (Exception ex)
             {
-                logger.LogError($"Failed to regiester user {regiesterRequestDto.FullName} with roles: {string.Join(", ", regiesterRequestDto.Roles)}. Error: {ex.Message}");
-                throw new Exception($"Failed to regiester user! Error: {ex.Message}");
+                // if identity result errors are more than 0 thats mean the error is related to identity framework and we can get the error from identity result errors
+                if (identityResult.Errors.Count() > 0)
+                {
+                    logger.LogError($"Failed to regiester user {regiesterRequestDto.FullName} with roles: {string.Join(", ", regiesterRequestDto.Roles)}. Error: {string.Join(", ", identityResult.Errors)}");
+                    throw new Exception($"Failed to regiester user! Error: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                }
+                // else the error is not related to identity framework
+                else
+                {
+                    logger.LogError($"Failed to regiester user {regiesterRequestDto.FullName} with roles: {string.Join(", ", regiesterRequestDto.Roles)}. Error: {ex.Message}");
+                    throw new Exception($"Failed to regiester user! Error: {ex.Message}");
+                }
 
             }
         }
@@ -191,6 +206,106 @@ namespace BiSaji.API.Services
                 throw;
             }
         }
+
+        public async Task<ServantDto> AddRolesAsync(Guid id, params string[] roles)
+        {
+            try
+            {
+                // get user by id from user repository
+                Servant servantDm = await servantRepository.GetByIdAsync(id);
+
+                // if user is null, return not found
+                if (servantDm == null)
+                {
+                    throw new NotFoundException($"No user found with {nameof(id)} {id}.");
+                }
+
+                foreach (var role in roles)
+                {
+                    var identityResult = await servantRepository.AddRolesAsync(servantDm, role);
+                    if (!identityResult.Succeeded)
+                    {
+                        logger.LogError($"Failed to assign role {role} to user with id {id} Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                        throw new Exception($"Failed to assign role {role} to user! Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                    }
+                }
+                // Mapping identity user to user dto
+                var servantDto = new ServantDto
+                {
+                    Id = id,
+                    FullName = servantDm.FullName,
+                    PhoneNumber = servantDm.PhoneNumber!,
+                    Roles = await servantRepository.GetRolesAsync(servantDm)
+                };
+                logger.LogInformation($"Roles [{string.Join(", ", roles)}] assigned to user {servantDm.FullName} successfully");
+                return servantDto;
+            }
+            catch (NotFoundException unfEx)
+            {
+                logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
+                throw;
+            }
+            catch (ArgumentException argEx)
+            {
+                logger.LogWarning(argEx, "Invalid input data for role assignment.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Failed to assign roles [{string.Join(", ", roles)}] to user with id {id} Error: {ex.Message}");
+                throw new Exception($"Failed to assign roles [{string.Join(", ", roles)}] to user! Error: {ex.Message}");
+            }
+        }
+        public async Task<ServantDto> RemoveRolesAsync(Guid id, params string[] roles)
+        {
+            try
+            {
+                // get user by id from user repository
+                Servant servantDm = await servantRepository.GetByIdAsync(id);
+
+                // if user is null, return not found
+                if (servantDm == null)
+                {
+                    throw new NotFoundException($"No user found with {nameof(id)} {id}.");
+                }
+
+                foreach (var role in roles)
+                {
+                    var identityResult = await servantRepository.RemoveRolesAsync(servantDm, role);
+                    if (!identityResult.Succeeded)
+                    {
+                        logger.LogError($"Failed to remove role {role} from user with id {id} Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                        throw new Exception($"Failed to remove role {role} from user! Errors: {string.Join(", ", identityResult.Errors.Select(e => e.Description))}");
+                    }
+                }
+                // Mapping identity user to user dto
+                var servantDto = new ServantDto
+                {
+                    Id = id,
+                    FullName = servantDm.FullName,
+                    PhoneNumber = servantDm.PhoneNumber!,
+                    Roles = await servantRepository.GetRolesAsync(servantDm)
+                };
+                logger.LogInformation($"Roles [{string.Join(", ", roles)}] removed from user {servantDm.FullName} successfully");
+                return servantDto;
+            }
+            catch (NotFoundException unfEx)
+            {
+                logger.LogWarning($"User with id {id} not found in database. Exception: {unfEx.Message}");
+                throw;
+            }
+            catch (ArgumentException argEx)
+            {
+                logger.LogWarning(argEx, "Invalid input data for role assignment.");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"Failed to remove roles [{string.Join(", ", roles)}] from user with id {id} Error: {ex.Message}");
+                throw new Exception($"Failed to remove roles [{string.Join(", ", roles)}] from user! Error: {ex.Message}");
+            }
+        }
+
         public async Task<Servant> ChangePasswordAsync(ClaimsPrincipal user, ChangePasswordRequestDto changePasswordRequestDto)
         {
             return await servantRepository.ChangePasswordAsync(user, changePasswordRequestDto);

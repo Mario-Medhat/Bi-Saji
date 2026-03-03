@@ -3,6 +3,7 @@ using BiSaji.API.Models.Dto.Auth;
 using BiSaji.API.Models.Dto.Servant;
 using BiSaji.API.Models.Dto.Users;
 using Microsoft.AspNetCore.Identity;
+using System.Collections;
 using System.Security.Claims;
 
 namespace BiSaji.API.Interfaces.RepositoryInterfaces
@@ -14,9 +15,11 @@ namespace BiSaji.API.Interfaces.RepositoryInterfaces
         public Task<(IdentityResult, Servant)> CreateAsync(ServantRegiesterRequestDto regiesterRequestDto);
         public Task<(IdentityResult, Servant)> UpdateAsync(Guid id, SetvantUpdateRequestDto updateRequestDto);
         public Task<(IdentityResult, Servant?)> DeleteAsync(Guid id);
-        public Task<IdentityResult> AddRolesToUserAsync(Servant servant, params string[] roles);
+        public Task<IdentityResult> AddRolesAsync(Servant servant, params string[] roles);
+        public Task<IdentityResult> RemoveRolesAsync(Servant servant, params string[] roles);
         public Task<Servant> ChangePasswordAsync(Guid id, BasePasswordRequestDto changePasswordRequestDto);
         public Task<Servant> ChangePasswordAsync(ClaimsPrincipal user, ChangePasswordRequestDto changePasswordRequestDto);
         public Task<Servant> ChangePasswordAsync(Servant servant, BasePasswordRequestDto changePasswordRequestDto);
+        public Task<IEnumerable<string>> GetRolesAsync(Servant servantDm);
     }
 }

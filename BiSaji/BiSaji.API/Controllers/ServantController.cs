@@ -16,11 +16,11 @@ namespace BiSaji.API.Controllers
     [Authorize]
     public class ServantController : ControllerBase
     {
-        private readonly ServantService _servantService;
+        private readonly ServantService servantService;
 
         public ServantController(ServantService servantService)
         {
-            _servantService = servantService;
+            this.servantService = servantService;
         }
 
         // GET: api/Servants/
@@ -30,7 +30,7 @@ namespace BiSaji.API.Controllers
         {
             try
             {
-                var usersDto = await _servantService.GetAllAsync(filterOn, filterQuery);
+                var usersDto = await servantService.GetAllAsync(filterOn, filterQuery);
                 return Ok(usersDto);
             }
             catch
@@ -47,7 +47,7 @@ namespace BiSaji.API.Controllers
             try
             {
                 // get user by id from user repository
-                var userDto = await _servantService.GetByIdAsync(id);
+                var userDto = await servantService.GetByIdAsync(id);
 
                 // if user is found, return the user
                 return Ok(userDto);
@@ -70,7 +70,7 @@ namespace BiSaji.API.Controllers
         {
             try
             {
-                await _servantService.RegisterAsync(regiesterRequestDto);
+                await servantService.RegisterAsync(regiesterRequestDto);
                 return Ok("Servant Regiestered! Please login.");
             }
             catch (Exception ex)
@@ -86,7 +86,7 @@ namespace BiSaji.API.Controllers
         {
             try
             {
-                var servantDto = await _servantService.UpdateAsync(id, updateRequestDto);
+                var servantDto = await servantService.UpdateAsync(id, updateRequestDto);
                 return Ok($"User updated successfully! \n\n{JsonSerializer.Serialize(servantDto, new JsonSerializerOptions { WriteIndented = true })}");
             }
             catch (NotFoundException unfEx)
@@ -106,7 +106,7 @@ namespace BiSaji.API.Controllers
         {
             try
             {
-                var servantDto = await _servantService.DeleteAsync(id);
+                var servantDto = await servantService.DeleteAsync(id);
                 return Ok($"User deleted successfully! \n\n{JsonSerializer.Serialize(servantDto, new JsonSerializerOptions { WriteIndented = true })}");
             }
             catch (NotFoundException unfEx)
@@ -119,6 +119,46 @@ namespace BiSaji.API.Controllers
             }
         }
 
+        // PUT: api/Servants/{id}/AddRole
+        [HttpPut("{id:guid}/AddRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddRole([FromRoute] Guid id, [FromBody] RolesRequestDto rolesRequestDto)
+        {
+            try
+            {
+                await servantService.AddRolesAsync(id, rolesRequestDto.Roles);
+                return Ok("Role assigned successfully!");
+            }
+            catch (NotFoundException unfEx)
+            {
+                return NotFound(unfEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to assign role! Error: {ex.Message}");
+            }
+        }
+
+        // PUT: api/Servants/{id}/RemoveRole
+        [HttpPut("{id:guid}/RemoveRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RemoveRole([FromRoute] Guid id, [FromBody] RolesRequestDto rolesRequestDto)
+        {
+            try
+            {
+                await servantService.RemoveRolesAsync(id, rolesRequestDto.Roles);
+                return Ok("Role removed successfully!");
+            }
+            catch (NotFoundException unfEx)
+            {
+                return NotFound(unfEx.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to remove role! Error: {ex.Message}");
+            }
+        }
+
         // PUT: api/Servants/{id}/ChangePassword
         [HttpPut("{id:guid}/ChangePassword")]
         [Authorize(Roles = "Admin")]
@@ -126,7 +166,7 @@ namespace BiSaji.API.Controllers
         {
             try
             {
-                await _servantService.ChangePasswordAsync(id, changePasswordRequestDto);
+                await servantService.ChangePasswordAsync(id, changePasswordRequestDto);
                 return Ok("Password changed successfully!");
             }
             catch (NotFoundException unfEx)

@@ -20,11 +20,19 @@ namespace BiSaji.API.Repositories
             this.userManager = userManager;
         }
 
-        public async Task<IdentityResult> AddRolesToUserAsync(Servant servant, params string[] roles)
+        public async Task<IdentityResult> AddRolesAsync(Servant servant, params string[] roles)
         {
             return await userManager.AddToRolesAsync(servant, roles);
         }
+        public async Task<IdentityResult> RemoveRolesAsync(Servant servant, params string[] roles)
+        {
+            return await userManager.RemoveFromRolesAsync(servant, roles);
+        }
 
+        public async Task<IEnumerable<string>> GetRolesAsync(Servant servantDm)
+        {
+            return await userManager.GetRolesAsync(servantDm);
+        }
         public async Task<(IdentityResult, Servant)> CreateAsync(ServantRegiesterRequestDto regiesterRequestDto)
         {
             if (regiesterRequestDto == null)
@@ -47,7 +55,12 @@ namespace BiSaji.API.Repositories
                 PhoneNumber = regiesterRequestDto.PhoneNumber
             };
 
+            // Create the user and set the password
             var identityResult = await userManager.CreateAsync(servant, regiesterRequestDto.Password);
+
+            // Assign roles to the user if the creation was successful
+            if (identityResult.Succeeded)
+                identityResult = await AddRolesAsync(servant, regiesterRequestDto.Roles);
 
             return (identityResult, servant);
         }
@@ -193,5 +206,6 @@ namespace BiSaji.API.Repositories
                 throw new Exception(ex.Message);
             }
         }
+
     }
 }

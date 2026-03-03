@@ -35,9 +35,9 @@ namespace BiSaji.API.Controllers
                 await authService.RegisterAsync(regiesterRequestDto);
                 return Ok("User registered successfully!");
             }
-            catch
+            catch (Exception ex) 
             {
-                return BadRequest("An error occurred while processing your request. Please try again later.");
+                return BadRequest($"An error occurred while processing your request. Please try again later.\n Errors: {ex.Message}");
             }
         }
 

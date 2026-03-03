@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 
 namespace BiSaji.API.Models.Dto.Users
 {
@@ -10,5 +11,7 @@ namespace BiSaji.API.Models.Dto.Users
 
         [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
+
+        public IEnumerable<string> Roles { get; set; }
     }
 }

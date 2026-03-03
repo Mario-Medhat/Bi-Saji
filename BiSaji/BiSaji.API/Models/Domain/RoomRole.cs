@@ -10,7 +10,7 @@ namespace BiSaji.API.Models.Domain
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// Gets or sets the name of the role (e.g. "Leader", "Assistant").
+        /// Gets or sets the name of the role (e.g. "Leader", "Assistant", "Photographer").
         /// </summary>
         [Required]
         [MaxLength(100)]
