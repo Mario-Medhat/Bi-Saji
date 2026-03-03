@@ -70,6 +70,7 @@ namespace BiSaji.API.Repositories
         {
             var users = userManager.Users
                 .AsNoTracking() // Avoid tracking for read-only operations to improve performance
+                .Include(user => user.Batch) // Include related Batch data if needed
                 .AsQueryable();
 
             // Apply filtering if filterOn and filterQuery are provided
@@ -90,7 +91,10 @@ namespace BiSaji.API.Repositories
 
         public async Task<Servant?> GetByIdAsync(Guid id)
         {
-            return await userManager.Users.FirstOrDefaultAsync(user => user.Id == id.ToString());
+            return await userManager.Users
+                .AsNoTracking() // Avoid tracking for read-only operations to improve performance
+                .Include(user => user.Batch) // Include related Batch data if needed
+                .FirstOrDefaultAsync(user => user.Id == id.ToString());
         }
 
         public async Task<(IdentityResult, Servant)> UpdateAsync(Guid id, SetvantUpdateRequestDto updateRequestDto)

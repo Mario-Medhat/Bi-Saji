@@ -40,6 +40,8 @@ namespace BiSaji.API.Services
                         Id = Guid.Parse(servantDm.Id),
                         FullName = servantDm.FullName,
                         PhoneNumber = servantDm.PhoneNumber!,
+                        BatchId = servantDm.BatchId,
+                        BatchName = servantDm.Batch != null ? servantDm.Batch.Name : null,
                         Roles = await servantRepository.GetRolesAsync(servantDm)
                     };
                     servantsDto.Add(servantDto);
@@ -75,11 +77,13 @@ namespace BiSaji.API.Services
                     Id = id,
                     FullName = servantDm.FullName,
                     PhoneNumber = servantDm.PhoneNumber!,
+                    BatchId = servantDm.BatchId,
+                    BatchName = servantDm.Batch != null ? servantDm.Batch.Name : null,
                     Roles = await servantRepository.GetRolesAsync(servantDm)
                 };
 
                 // if user is found, return the user
-                logger.LogInformation($"Returning user with id {id}\n User returned:\n{JsonSerializer.Serialize(servantDm)}");
+                logger.LogInformation($"Returning user with id {id}\n User returned:\n{JsonSerializer.Serialize(servantDto)}");
                 return servantDto;
             }
             catch (NotFoundException unfEx)

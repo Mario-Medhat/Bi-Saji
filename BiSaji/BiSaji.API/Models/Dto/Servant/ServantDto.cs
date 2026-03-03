@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BiSaji.API.Models.Dto.Users
 {
@@ -13,5 +14,10 @@ namespace BiSaji.API.Models.Dto.Users
         public string PhoneNumber { get; set; }
 
         public IEnumerable<string> Roles { get; set; }
+
+         public Guid? BatchId { get; set; }
+
+        public string? BatchName { get; set; }
+
     }
 }
