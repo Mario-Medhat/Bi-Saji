@@ -3,6 +3,7 @@ using BiSaji.API.Models.Domain;
 using BiSaji.API.Models.Dto.Batch;
 using BiSaji.API.Models.Dto.Students;
 using BiSaji.API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,6 +13,7 @@ namespace BiSaji.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BatchController : ControllerBase
     {
         private readonly BatchService batchService;
@@ -23,6 +25,7 @@ namespace BiSaji.API.Controllers
 
         // GET: api/Batches
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<BatchDto>>> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
         {
             try
@@ -39,6 +42,7 @@ namespace BiSaji.API.Controllers
 
         // GET: api/Batches/{id}
         [HttpGet("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BatchDto>?> GetById([FromRoute] Guid id)
         {
             try
@@ -58,6 +62,7 @@ namespace BiSaji.API.Controllers
 
         // POST: api/Batches
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BatchDto>> Create([FromBody] BatchCreateRequestDto batch)
         {
             try
@@ -79,6 +84,7 @@ namespace BiSaji.API.Controllers
 
         // PUT: api/Batches/{id}
         [HttpPut("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BatchDto?>> Update([FromRoute] Guid id, [FromBody] BatchUpdateRequestDto batchUpdateRequestDto)
         {
             try
@@ -98,6 +104,7 @@ namespace BiSaji.API.Controllers
 
         // DELETE: api/Batches/{id}
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BatchDto?>> Delete([FromRoute] Guid id)
         {
 
