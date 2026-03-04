@@ -1,7 +1,5 @@
 ﻿using BiSaji.API.Exceptions;
-using BiSaji.API.Models.Domain;
-using BiSaji.API.Models.Dto.Batch;
-using BiSaji.API.Models.Dto.Students;
+using BiSaji.API.Models.Dto.Day;
 using BiSaji.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -14,25 +12,24 @@ namespace BiSaji.API.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class BatchController : ControllerBase
+    public class DayController : ControllerBase
     {
-        private readonly BatchService batchService;
+        private readonly DayService dayService;
 
-        public BatchController(BatchService batchService)
+        public DayController(DayService dayService)
         {
-            this.batchService = batchService;
+            this.dayService = dayService;
         }
 
-        // GET: api/Batch
+        // GET: api/Day
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<IEnumerable<BatchDto>>> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
+        public async Task<ActionResult<IEnumerable<DayDto>>> GetAll([FromQuery] string? filterOn, [FromQuery] string? filterQuery)
         {
             try
             {
-                var batchsDto = await batchService.GetAllAsync(filterOn, filterQuery);
-                return Ok(batchsDto);
-
+                var daysDtos = await dayService.GetAllAsync(filterOn, filterQuery);
+                return Ok(daysDtos);
             }
             catch (Exception ex)
             {
@@ -40,15 +37,15 @@ namespace BiSaji.API.Controllers
             }
         }
 
-        // GET: api/Batch/{id}
+        // GET: api/day/{id}
         [HttpGet("{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BatchDto>?> GetById([FromRoute] Guid id)
+        public async Task<ActionResult<DayDto>?> GetById([FromRoute] Guid id)
         {
             try
             {
-                var batchDto = await batchService.GetByIdAsync(id);
-                return Ok(batchDto);
+                var dayDto = await dayService.GetByIdAsync(id);
+                return Ok(dayDto);
             }
             catch (NotFoundException ex)
             {
@@ -60,10 +57,10 @@ namespace BiSaji.API.Controllers
             }
         }
 
-        // POST: api/Batch
+        // POST: api/Day
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BatchDto>> Create([FromBody] BatchCreateRequestDto batch)
+        public async Task<ActionResult<DayDto>> Create([FromBody] DayCreateRequestDto day)
         {
             try
             {
@@ -73,8 +70,8 @@ namespace BiSaji.API.Controllers
                 if (logedInUserId == null)
                     return Unauthorized();
 
-                var batchDto = await batchService.CreateAsync(batch, logedInUserId);
-                return Ok($"Batch has been created successfully.\n\n{JsonSerializer.Serialize(batchDto, new JsonSerializerOptions { WriteIndented = true })}");
+                var dayDto = await dayService.CreateAsync(day, logedInUserId);
+                return Ok($"Day has been created successfully.\n\n{JsonSerializer.Serialize(dayDto, new JsonSerializerOptions { WriteIndented = true })}");
             }
             catch (Exception ex)
             {
@@ -82,15 +79,16 @@ namespace BiSaji.API.Controllers
             }
         }
 
-        // PUT: api/Batch/{id}
+        // PUT: api/Day/{id}
         [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BatchDto?>> Update([FromRoute] Guid id, [FromBody] BatchUpdateRequestDto batchUpdateRequestDto)
+        public async Task<ActionResult<DayDto?>> Update([FromRoute] Guid id, [FromBody] DayUpdateRequestDto dayUpdateRequestDto)
         {
+            // TODO: fix name is required for Update issue
             try
             {
-                var batchDto = await batchService.UpdateAsync(id, batchUpdateRequestDto);
-                return Ok($"Batch updated successfully! \n\n{JsonSerializer.Serialize(batchDto, new JsonSerializerOptions { WriteIndented = true })}");
+                var dayDto = await dayService.UpdateAsync(id, dayUpdateRequestDto);
+                return Ok($"Day updated successfully! \n\n{JsonSerializer.Serialize(dayDto, new JsonSerializerOptions { WriteIndented = true })}");
             }
             catch (NotFoundException ex)
             {
@@ -102,16 +100,16 @@ namespace BiSaji.API.Controllers
             }
         }
 
-        // DELETE: api/Batch/{id}
+        // DELETE: api/Day/{id}
         [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BatchDto?>> Delete([FromRoute] Guid id)
+        public async Task<ActionResult<DayDto?>> Delete([FromRoute] Guid id)
         {
 
             try
             {
-                var batchDto = await batchService.DeleteAsync(id);
-                return Ok($"Batch \"{batchDto.Name}\" has been deleted successfully.");
+                var dayDto = await dayService.DeleteAsync(id);
+                return Ok($"Day \"{dayDto.Name}\" has been deleted successfully.");
             }
             catch (NotFoundException nfEx)
             {
@@ -122,5 +120,6 @@ namespace BiSaji.API.Controllers
                 return BadRequest($"Internal server error: {ex.Message}");
             }
         }
+
     }
 }

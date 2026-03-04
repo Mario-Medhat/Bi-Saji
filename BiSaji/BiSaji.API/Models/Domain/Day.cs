@@ -12,6 +12,10 @@ namespace BiSaji.API.Models.Domain
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
+        [Required]
+        [StringLength(255)]
+        public string Name { get; set; }
+
         /// <summary>
         /// Gets or sets the scheduled date for this day.
         /// </summary>
