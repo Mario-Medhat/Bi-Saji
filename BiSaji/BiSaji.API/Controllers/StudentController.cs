@@ -2,7 +2,7 @@
 using BiSaji.API.Exceptions;
 using BiSaji.API.Interfaces.RepositoryInterfaces;
 using BiSaji.API.Models.Domain;
-using BiSaji.API.Models.Dto.Students;
+using BiSaji.API.Models.Dto.Student;
 using BiSaji.API.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

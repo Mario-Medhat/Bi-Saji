@@ -104,6 +104,7 @@ namespace BiSaji.API
             builder.Services.AddScoped<IStudentRepository, SQLStudentRepository>();
             builder.Services.AddScoped<IBatchRepository, SQLBatchRepository>();
             builder.Services.AddScoped<IDayRepository, SQLDayRepository>();
+            builder.Services.AddScoped<IMovementGroupRepository, SQLMovementGroupRepository>();
 
             // Services
             builder.Services.AddScoped<AuthService>();
@@ -111,6 +112,7 @@ namespace BiSaji.API
             builder.Services.AddScoped<StudentService>();
             builder.Services.AddScoped<BatchService>();
             builder.Services.AddScoped<DayService>();
+            builder.Services.AddScoped<MovementGroupService>();
 
             // TODO: Add AutoMapper
             //builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));

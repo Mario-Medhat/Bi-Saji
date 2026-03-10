@@ -10,7 +10,5 @@ namespace BiSaji.API.Models.Dto.Servant
 
         [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
-
-        public IEnumerable<string> Roles { get; set; }
     }
 }

@@ -74,7 +74,6 @@ namespace BiSaji.API.Services
                             Id = servant.Id,
                             FullName = servant.FullName,
                             PhoneNumber = servant.PhoneNumber ?? "",
-                            Roles = await servantRepository.GetRolesAsync(servant),
                         });
                     }
                 }
@@ -127,7 +126,6 @@ namespace BiSaji.API.Services
                                 Id = servant.Id,
                                 FullName = servant.FullName,
                                 PhoneNumber = servant.PhoneNumber ?? "",
-                                Roles = await servantRepository.GetRolesAsync(servant),
                             });
                         }
                     }
