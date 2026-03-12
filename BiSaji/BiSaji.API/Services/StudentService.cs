@@ -81,7 +81,34 @@ namespace BiSaji.API.Services
         {
             try
             {
-                var student = await studentRepository.UpdateAsync(id, studentUpdateRequestDto);
+                var updateStudent = await studentRepository.GetByIdAsync(id);
+
+                if (updateStudent == null)
+                    throw new NotFoundException($"Student with ID {id} not found for update.");
+
+                if (!string.IsNullOrWhiteSpace(studentUpdateRequestDto.FullName))
+                    updateStudent.FullName = studentUpdateRequestDto.FullName;
+
+                if (!string.IsNullOrWhiteSpace(studentUpdateRequestDto.PhoneNumber))
+                    updateStudent.PhoneNumber = studentUpdateRequestDto.PhoneNumber;
+
+                if (!string.IsNullOrWhiteSpace(studentUpdateRequestDto.ParentPhoneNumber))
+                    updateStudent.ParentPhoneNumber = studentUpdateRequestDto.ParentPhoneNumber;
+
+                if (!string.IsNullOrWhiteSpace(studentUpdateRequestDto.AdditionalParentPhoneNumber))
+                    updateStudent.AdditionalParentPhoneNumber = studentUpdateRequestDto.AdditionalParentPhoneNumber;
+
+                if (studentUpdateRequestDto.DateOfBirth != null)
+                    updateStudent.DateOfBirth = studentUpdateRequestDto.DateOfBirth.Value;
+
+                if (studentUpdateRequestDto.BatchId != Guid.Empty)
+                    updateStudent.BatchId = studentUpdateRequestDto.BatchId;
+
+
+                var student = await studentRepository.UpdateAsync(id, updateStudent);
+
+                if (student == null)
+                    throw new NotFoundException($"Student with id: {id} not found");
 
                 // mapping
                 StudentDto studentDto = new StudentDto
@@ -110,11 +137,22 @@ namespace BiSaji.API.Services
             }
         }
 
-        public async Task<StudentDto> CreateAsync(StudentRegiesterRequestDto studentRegiesterRequestDto)
+        public async Task<StudentDto> CreateAsync(StudentRegiesterRequestDto regiesterRequestDto)
         {
             try
             {
-                var createdStudent = await studentRepository.CreateAsync(studentRegiesterRequestDto);
+                // mapping
+                Student student = new Student
+                {
+                    FullName = regiesterRequestDto.FullName,
+                    PhoneNumber = regiesterRequestDto.PhoneNumber,
+                    ParentPhoneNumber = regiesterRequestDto.ParentPhoneNumber,
+                    AdditionalParentPhoneNumber = regiesterRequestDto.ParentPhoneNumber,
+                    DateOfBirth = regiesterRequestDto.DateOfBirth,
+                    BatchId = regiesterRequestDto.BatchId,
+                };
+
+                var createdStudent = await studentRepository.CreateAsync(student);
 
                 // mapping
                 StudentDto studentDto = new StudentDto

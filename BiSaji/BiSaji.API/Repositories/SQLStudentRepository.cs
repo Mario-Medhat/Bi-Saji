@@ -17,21 +17,10 @@ namespace BiSaji.API.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<Student> CreateAsync(StudentRegiesterRequestDto regiesterRequestDto)
+        public async Task<Student> CreateAsync(Student student)
         {
             try
             {
-                // mapping
-                Student student = new Student
-                {
-                    FullName = regiesterRequestDto.FullName,
-                    PhoneNumber = regiesterRequestDto.PhoneNumber,
-                    ParentPhoneNumber = regiesterRequestDto.ParentPhoneNumber,
-                    AdditionalParentPhoneNumber = regiesterRequestDto.ParentPhoneNumber,
-                    DateOfBirth = regiesterRequestDto.DateOfBirth,
-                    BatchId = regiesterRequestDto.BatchId,
-                };
-
                 await dbContext.Students.AddAsync(student);
                 await dbContext.SaveChangesAsync();
 
@@ -77,22 +66,22 @@ namespace BiSaji.API.Repositories
             return student;
         }
 
-        public async Task<Student> UpdateAsync(Guid id, StudentUpdateRequestDto updateRequestDto)
+        public async Task<Student?> UpdateAsync(Guid id, Student updatedStudent)
         {
             Student? student = await dbContext.Students.FindAsync(id);
 
             if (student == null)
-            {
-                throw new NotFoundException($"Student with id: {id} not found");
-            }
+                return null;
+            
 
-            student.FullName = updateRequestDto.FullName ?? student.FullName;
-            student.PhoneNumber = updateRequestDto.PhoneNumber ?? student.PhoneNumber;
-            student.ParentPhoneNumber = updateRequestDto.ParentPhoneNumber ?? student.ParentPhoneNumber;
-            student.AdditionalParentPhoneNumber = updateRequestDto.AdditionalParentPhoneNumber ?? student.AdditionalParentPhoneNumber;
-            student.BatchId = updateRequestDto.BatchId ?? student.BatchId;
-            if (updateRequestDto.DateOfBirth.HasValue)
-                student.DateOfBirth = updateRequestDto.DateOfBirth.Value;
+            student.FullName = updatedStudent.FullName ?? student.FullName;
+            student.PhoneNumber = updatedStudent.PhoneNumber ?? student.PhoneNumber;
+            student.ParentPhoneNumber = updatedStudent.ParentPhoneNumber ?? student.ParentPhoneNumber;
+            student.AdditionalParentPhoneNumber = updatedStudent.AdditionalParentPhoneNumber ?? student.AdditionalParentPhoneNumber;
+            student.BatchId = updatedStudent.BatchId ?? student.BatchId;
+            
+            if (updatedStudent.DateOfBirth != DateOnly.MinValue)
+                student.DateOfBirth = updatedStudent.DateOfBirth;
 
             await dbContext.SaveChangesAsync();
 
